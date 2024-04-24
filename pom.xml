@@ -7,15 +7,16 @@
 
     <groupId>ag.selm</groupId>
     <artifactId>selmag-parent</artifactId>
-    <version>24.1.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>manager</module>
+        <module>catalogue-server</module>
     </modules>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21.0.2</maven.compiler.source>
+        <maven.compiler.target>21.0.2</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.2.2</spring-boot.version>
     </properties>

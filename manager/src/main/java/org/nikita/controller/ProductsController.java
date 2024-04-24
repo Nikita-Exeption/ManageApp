@@ -1,19 +1,15 @@
 package org.nikita.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.nikita.client.BadRequestException;
+import org.nikita.client.ProductRestClient;
 import org.nikita.controller.payload.NewProductPayLoad;
 import org.nikita.entity.Product;
-import org.nikita.service.ProductService;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,7 +17,7 @@ import java.util.stream.Collectors;
 public class ProductsController {
 
 
-    private final ProductService service;
+    private final ProductRestClient service;
 
     @GetMapping("/list")
     public String getProducts(Model model) {
@@ -35,17 +31,14 @@ public class ProductsController {
     }
 
     @PostMapping("create")
-    public String createProduct(@Valid NewProductPayLoad payLoad, BindingResult result, Model model) {
-        if (result.hasErrors()) {
+    public String createProduct(NewProductPayLoad payLoad, Model model) {
+        try {
+            Product product = service.createProduct(payLoad.title(), payLoad.details());
+            return "redirect:/catalogue/products/%d".formatted(product.id());
+        } catch (BadRequestException exception) {
+            model.addAttribute("errors", exception.getErrors());
             model.addAttribute("payLoad", payLoad);
-            model.addAttribute("errors", result.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList()));
-            return "catalogue/products/create";
-        } else {
-            Product product = service.createNewProduct(payLoad.title(), payLoad.details());
-            return "redirect:/catalogue/products/%d".formatted(product.getId());
+            return "redirect:/catalogue/create";
         }
     }
 
