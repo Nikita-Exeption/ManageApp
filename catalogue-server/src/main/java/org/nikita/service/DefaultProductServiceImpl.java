@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.nikita.entity.Product;
 import org.nikita.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -17,30 +17,41 @@ public class DefaultProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<Product> findAllProducts() {
-        return repository.getAll();
+    public Iterable<Product> findAllProducts(String filter) {
+        if (filter != null && !filter.isBlank()) {
+            return repository.findAllByTitleLikeIgnoreCase(filter);
+        } else {
+            return repository.findAll();
+        }
     }
 
     @Override
+    @Transactional
     public Product createNewProduct(String title, String details) {
-        return repository.addNewProduct(title, details);
+        return repository.save(new Product(null, title, details));
     }
 
     @Override
     public Optional<Product> findProductById(Integer id) {
-        return repository.getById(id);
+        return repository.findById(id);
     }
 
     @Override
+    @Transactional
     public void updateProduct(Integer id, String title, String details) {
-        repository.getById(id).ifPresentOrElse(x -> {
+        repository.findById(id).ifPresentOrElse(x -> {
                     x.setTitle(title);
                     x.setDetails(details);
-                }, () -> { throw new NoSuchElementException();}
+
+                    repository.save(x);
+                }, () -> {
+                    throw new NoSuchElementException();
+                }
         );
     }
 
     @Override
+    @Transactional
     public void deleteProductById(Integer id) {
         repository.deleteById(id);
     }

@@ -10,6 +10,7 @@ out/
 *.war
 *.ear
 *.nar
+*.log
 hs_err_pid*
 replay_pid*
 target/

@@ -11,7 +11,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,8 +21,8 @@ public class ProductsRestController {
     private final ProductService service;
 
     @GetMapping
-    public List<Product> findProducts() {
-        return service.findAllProducts();
+    public Iterable<Product> findProducts(@RequestParam(name = "filter", required = false) String filter) {
+        return service.findAllProducts("%" + filter + "%");
     }
 
     @PostMapping
@@ -45,6 +44,5 @@ public class ProductsRestController {
                     .body(product);
         }
     }
-
 }
 

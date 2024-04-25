@@ -25,10 +25,10 @@ public class RestClientProductRestClient implements ProductRestClient {
     private final RestClient client;
 
     @Override
-    public List<Product> findAllProducts() {
+    public List<Product> findAllProducts(String filter) {
         return client
                 .get()
-                .uri("catalogue-api/products")
+                .uri("/catalogue-api/products?filter={filter}", filter)
                 .retrieve()
                 .body(PRODUCTS_PARAMETERIZED_TYPE);
     }
@@ -74,7 +74,7 @@ public class RestClientProductRestClient implements ProductRestClient {
                     .toBodilessEntity();
         } catch (HttpClientErrorException exception) {
             ProblemDetail problemDetail = exception.getResponseBodyAs(ProblemDetail.class);
-            throw new BadRequestException((List<String>)Objects.requireNonNull(problemDetail.getProperties()).get("errors"));
+            throw new BadRequestException((List<String>) problemDetail.getProperties().get("errors"));
         }
 
     }
